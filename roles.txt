@@ -1,63 +1,63 @@
-Name            Team AP DP  Imm 
-Investigator    T   0   0   -    
-Lookout         T   0   0   -   
-Psychic         T   0   0   -   
-Sheriff         T   0   0   -   
-Spy             T   0   0   RCB     
-Tracker         T   0   0   -   
-Jailer          T   3   0   -   
-Vampire_Hunter  T   2   0   B+    
-Vigilante       T   1   0   -          
-Veteran         T   2   0   RC  
-Chef            T   3   0   -          
-Bodyguard       T   2   0   -   
-Doctor          T   0   0   -   
-Crusader        T   1   0   -   
-Trapper         T   2   0   -   
-Priest          T   0   0   -   
-Hacker          T   0   0   R       
-Therapist       T   0   0   -   
-Escort          T   0   0   R   
-Mayor           T   0   0   -
-Medium          T   0   0   RC  
-Retributionist  T   0   0   -   
-Transporter     T   0   0   RC
-Moosehead       T   0   0   RC
-Godfather       M   1   1   DB   
-Mafioso         M   1   0   - 
-Ambusher        M   1   0   R 
-Bomber          M   2   0   - 
-Lawyer          M   0   0   C 
-Disguiser       M   0   1   - 
-Janitor         M   0   0   - 
-Hypnotist       M   0   0   - 
-House_Painter   M   0   0   - 
-Thug            M   2   0   - 
-Bookie          M   0   0   - 
-Consigliere     M   0   0   - 
-Consort         M   0   0   R 
-Coven_Leader    C   0   1   RB 
-Necromancer     C   0   0   R 
-Poisoner        C   3   0   - 
-Hex_Master      C   0   0   - 
-Siren           C   0   0   - 
-Potion_Master   C   1   0   - 
-Medusa          C   2   0   - 
-Puppeteer       C   0   0   - 
-Mirage          C   0   0   - 
-Amnesiac        -   0   0   C 
-Apprentice      -   0   0   - 
-Guardian_Angel  -   0   0   - 
-Survivor        -   0   0   - 
-Pirate          -   2   0   R 
-Executioner     -   0   1   B 
-Jester          -   3   0   C 
-Plaguebearer    -   0   1   DB
-Pestilence      -   3   3   R+B+DC
-Arsonist        -   3   1   B
-Serial_Killer   S   1   1   R+B
-Werewolf        W   2   1   B
-Juggernaut      -   1   0   -
-Eros            -   3   0   -
-Eldest_Vampire  V   0   1   D
-Vampire         V   0   0   RDC
+Name            Team AP DP  Imm Avg# Exp
+Investigator    T   0   0   -   1   0    
+Lookout         T   0   0   -   1   0    
+Psychic         T   0   0   -   1   0    
+Sheriff         T   0   0   -   2   0       
+Spy             T   0   0   RCB 1   0        
+Tracker         T   0   0   -   2   0   
+Jailer          T   3   0   -   1   0   
+Vampire_Hunter  T   2   0   B+  1   0     
+Vigilante       T   1   0   -   1   0          
+Veteran         T   2   0   RC  1   0   
+Chef            T   3   0   -   2   0          
+Bodyguard       T   2   0   -   1   0   
+Doctor          T   0   0   -   1   0   
+Crusader        T   1   0   -   1   0   
+Trapper         T   2   0   -   1   0   
+Priest          T   0   0   -   1   0   
+Hacker          T   0   0   R   1   0       
+Therapist       T   0   0   -   1   0   
+Escort          T   0   0   R   1   0   
+Mayor           T   0   0   -   1   0   
+Medium          T   0   0   RC  1   0   
+Retributionist  T   0   0   -   1   0   
+Transporter     T   0   0   RC  1   0   
+Moosehead       T   0   0   RC  0   0   
+Godfather       M   1   1   DB  1   0       
+Mafioso         M   1   0   -   1   0   
+Ambusher        M   1   0   R   0   0  
+Bomber          M   2   0   -   1   0 
+Lawyer          M   0   0   C   1   0 
+Disguiser       M   0   1   -   1   0 
+Janitor         M   0   0   -   0   0 
+Hypnotist       M   0   0   -   0   0 
+House_Painter   M   0   0   -   1   0 
+Thug            M   2   0   -   1   0 
+Bookie          M   0   0   -   0   0 
+Consigliere     M   0   0   -   1   0 
+Consort         M   0   0   R   0   0 
+Coven_Leader    C   0   1   RB  1   0 
+Necromancer     C   0   0   R   1   0 
+Poisoner        C   3   0   -   1   0 
+Hex_Master      C   0   0   -   1   0 
+Siren           C   0   0   -   2   0 
+Potion_Master   C   1   0   -   1   0 
+Medusa          C   2   0   -   2   0 
+Puppeteer       C   0   0   -   1   0 
+Mirage          C   0   0   -   1   0 
+Amnesiac        -   0   0   C   0   0 
+Apprentice      -   0   0   -   1   0 
+Guardian_Angel  -   0   0   -   1   0 
+Survivor        -   0   0   -   0   0 
+Pirate          -   2   0   R   1   0 
+Executioner     -   0   1   B   0   0 
+Jester          -   3   0   C   1   0 
+Plaguebearer    -   0   1   DB  1   0 
+Pestilence      -   3   3   R+B+DC 0   0 
+Arsonist        -   3   1   B   0   0 
+Serial_Killer   S   1   1   R+B 0   0 
+Werewolf        W   2   1   B   1   0 
+Juggernaut      -   1   0   -   1   0 
+Eros            -   3   0   -   1   0 
+Eldest_Vampire  V   0   1   D   1   0 
+Vampire         V   0   0   RDC 1   0 
