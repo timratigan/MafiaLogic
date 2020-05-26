@@ -46,8 +46,12 @@ for known_name, known_role in known_assignments.items():
 for player_index in range(num_players):
     sus_matrix[player_index,] /= np.sum(sus_matrix[player_index,])
 
-player_assignment = generate_player_assignment(sus_matrix, role_counts)
-print(player_assignment)
+for t in range(3):
+    player_assignment = generate_simple_assignment(sus_matrix, role_counts)
+    print(player_assignment)
+
+# Simulate (a stupid) game
+
 
 # Notes from Seth:
 # Suspicion Matrix for each faction 
