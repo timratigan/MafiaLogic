@@ -1,0 +1,69 @@
+Investigator
+Lookout
+Psychic
+Sheriff
+Spy
+Tracker
+Killing Roles
+Jailer
+Vampire Hunter
+Vigilante
+Veteran
+Chef
+Protective Roles
+Bodyguard
+Doctor
+Crusader
+Trapper
+Priest
+Support Roles
+Hacker
+Therapist
+Escort
+Mayor
+Medium
+Retributionist
+Transporter
+Moosehead
+Godfather
+Mafioso
+Ambusher
+Bomber
+Deceptive Roles
+Lawyer
+Disguiser
+Janitor
+Hypnotist
+House Painter
+Support Roles
+Thug
+Bookie
+Consigliere
+Consort
+Coven Leader (Witch)
+Necromancer
+Poisoner
+Hex Master
+Siren
+Potion Master
+Medusa
+Puppeteer
+Mirage
+Amnesiac
+Apprentice
+Guardian Angel
+Survivor
+Pirate
+Executioner
+Jester
+Evil Roles
+Plaguebearer
+Pestilence
+Arsonist
+Serial Killer
+Werewolf
+Juggernaut
+Eros (Killer Cupid)
+Vampires
+Vampire (eldest)
+Vampire
