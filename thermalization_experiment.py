@@ -104,12 +104,12 @@ for r in range(runs):
 for r in range(runs):
     plt.plot(times[r], values[r], color='b', alpha=0.25)
 plt.plot(np.array(range(trials)) + thermalization, avg_value/runs, color='r')
-plt.savefig("graph.png")
+plt.savefig("files/graphs/graph.png")
 
 plt.clf()
 plt.scatter(np.log(list(encounters.values())),np.log(list(expected_encounters.values())))
 plt.plot(np.log(list(encounters.values())),np.log(list(encounters.values())), color='r')
-plt.savefig("graph2.png")
+plt.savefig("files/graphs/graph2.png")
 
 for t in range(runs*trials):
     print(tuple(simple_sample(sus_square)))
@@ -118,7 +118,7 @@ for t in range(runs*trials):
 plt.clf()
 plt.scatter(np.log(list(simple_encounters.values())),np.log(list(expected_encounters.values())))
 plt.plot(np.log(list(simple_encounters.values())),np.log(list(simple_encounters.values())), color='r')
-plt.savefig("graph3.png")
+plt.savefig("files/graphs/graph3.png")
 
 """ Correlation lengths
 

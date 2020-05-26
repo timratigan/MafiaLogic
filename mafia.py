@@ -1,16 +1,16 @@
-import numpy as np
-import re
-from extra_functions import *
 from load_data import *
 from generate_players import *
-import matplotlib.pyplot as plt
-from time import time
+from simulate_game import *
 
 random.seed(0)
 np.random.seed(0)
 # Known information
-known_assignments = {"Seth Lovelace":"Coven_Leader", "Irene Hsu":"Siren","AJ Kawczynski":"Siren","Emerson Thomas":"Medusa", "Conor Rachlin":"Medusa", "Lucas Salvador":"Poisoner", "Max Jerdee":"Puppeteer", "Natalia Miller":"Hex_Master", "Cassidy Crone":"Necromancer", "Ed Horan":"Potion_Master", "Emma Moriarty":"Mirage"} 
+known_assignments = {"Alan Ding":"Medium","Mary Davis":"Sheriff","Ethan Whittaker":"Trapper","Nina Arcot":"Escort","Oscar Loría":"Moosehead","Grace Chen":"Consort","Jacob Brown":"Bomber","Eaman Shire":"Apprentice","Eitan Zlatin":"Plaguebearer","Gabrielle D'Arcangelo":"Vampire","Seth Lovelace":"Coven_Leader", "Irene Hsu":"Siren","AJ Kawczynski":"Siren","Emerson Thomas":"Medusa", "Conor Rachlin":"Medusa", "Lucas Salvador":"Poisoner", "Max Jerdee":"Puppeteer", "Natalia Miller":"Hex_Master", "Cassidy Crone":"Necromancer", "Ed Horan":"Potion_Master", "Emma Moriarty":"Mirage"} 
 known_counts = {"Siren":2,"Medusa":2,"Poisoner":1,"Hex_Master":1,"Necromancer":1,"Potion_Master":1,"Mirage":1}
+# check for typos:
+for k,v in known_assignments.items():
+    if players.index(k) == -1 or role_names.index(v) == -1:
+        print(k,v)
 
 GOD_RANDOMNESS = 0.5 # Assume that each role appears with \pm GOD_RANDOMNESS*100 %. 
 MIN_ROLE = 0 # Option to force a minimum number of players in each role
@@ -26,10 +26,10 @@ for t in range(10):
             anomalies.update({role_names[role_index]:role_counts[role_index]})
     print(anomalies)
 """
-role_counts = generate_role_counts(GOD_RANDOMNESS,MIN_ROLE,MAX_ROLE,MAX_ROLE_MULT,known_counts)
+role_counts = generate_role_counts(GOD_RANDOMNESS,MIN_ROLE,MAX_ROLE,MAX_ROLE_MULT,known_assignments,known_counts)
 
 # Start with flat sus_matrix
-sus_matrix = np.ones((num_players,num_roles))/num_roles + 0.01*np.random.rand(num_players,num_roles) # Matrix containing suspicions, sus_matrix[player,role] is % chance player is role 
+sus_matrix = np.ones((num_players,num_roles))/num_roles + 0*np.random.rand(num_players,num_roles) # Matrix containing suspicions, sus_matrix[player,role] is % chance player is role 
 
 """
 # Hint sus_matrix with known roles
@@ -46,20 +46,12 @@ for known_name, known_role in known_assignments.items():
 for player_index in range(num_players):
     sus_matrix[player_index,] /= np.sum(sus_matrix[player_index,])
 
-for t in range(3):
-    player_assignment = generate_simple_assignment(sus_matrix, role_counts)
-    print(player_assignment)
+player_assignment = generate_simple_assignment(sus_matrix, role_counts)
+#print("Player Assignment:", player_assignment)
+
+# Game Simulation: Given your suspicions, what is the chance of various events occuring?
+# Updating Priors: Given what has played out, here are the computer's suspicions (Targeted Monte-Carlo from beginning)
 
 # Simulate (a stupid) game
+simulate_game(player_assignment)
 
-
-# Notes from Seth:
-# Suspicion Matrix for each faction 
-# Player State: Role, Alive/Dead, AP, Base DP, Extra DP, Poisoned, Infected, Doused, Target, 
-# Visit_History, Jailed, RBed, Love, Trapped, Hexxed, Bombed-1=no bomb: ticker otherwise, Vested 
-# Spy suspicions approach reality slowly 
-# ^ store as array of dictionaries? 
-
-# Game State: Player States + Suspicion Matrices, Moon/Full Moon 
-
-# Check victory conditions 

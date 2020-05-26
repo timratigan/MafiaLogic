@@ -1,4 +1,14 @@
-# loading in  and configuring game information
+import numpy as np
+import re
+import matplotlib.pyplot as plt
+from time import time
+from bisect import bisect_right
+import numpy as np
+import random
+import json
+from extra_functions import *
+
+# loading in data and packages and configuring game information
 # defined as groups of players which may share information
 teams = ["T", "M", "C", "V", "S", "W"] # Town, Mafia, Coven, Vampires, Serial Killers, Werewolvs
 
@@ -6,7 +16,7 @@ roles = [] # full role information
 role_names = [] # names of roles
 role_teams = [] # number denoting the affiliation of each role
 
-with open("roles.txt","r") as role_reader:
+with open("files/roles.txt","r") as role_reader:
     for role in role_reader:
         current_role = role.split()
         if current_role[0] != "Name":
@@ -21,7 +31,7 @@ investigation_groups = [["Investigator", "Consigliere", "Mayor", "Survivor", "Pl
                     ["Arsonist", "Retributionist", "Necromancer", "Trapper", "Bomber"],["Transporter", "House_Painter", "Therapist", "Mirage", "Apprentice"]]
 
 players = []
-with open("players.txt","r") as player_reader:
+with open("files/players.txt","r") as player_reader:
     for player in player_reader:
         players.append(player[:-1])
 
@@ -38,6 +48,8 @@ total_expected = 0
 for role in roles:
     total_expected += float(role[5])
 if total_expected != num_players:
-    print("Warning: # of players unequal to God expectations", total_expected, num_players)
+    print("Warning: # of players unequal to God expectations:", num_players, "!=",total_expected)
+
+known_game_state = json.loads('files/known_game_state.json')
 
 epsilon = 10**(-14)

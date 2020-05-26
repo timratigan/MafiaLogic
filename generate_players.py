@@ -1,10 +1,6 @@
-import numpy as np
-import random
 from load_data import *
-import matplotlib.pyplot as plt 
-from bisect import bisect_right
 
-def generate_role_counts(GOD_RANDOMNESS=0.4,MIN_ROLE=1,MAX_ROLE=5,MAX_ROLE_MULT=2,known_counts={},print_flag=False):
+def generate_role_counts(GOD_RANDOMNESS=0.4,MIN_ROLE=1,MAX_ROLE=5,MAX_ROLE_MULT=2,known_assignments={},known_counts={},print_flag=False):
     # Use God expectations to produce role numbers:
     role_counts = np.zeros(num_roles,dtype=int)
     # Generate a random role_count from normal distributions:
