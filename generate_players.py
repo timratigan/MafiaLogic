@@ -50,14 +50,6 @@ def assignment_energy(assignment, sus_square): # Calculate the "energy" (- log o
         chance_sum += sus_square[player_index, assignment[player_index]]
     return -np.log(probability + 0*chance_sum) 
 
-def check_assignment(assignment, role_indices_extended):
-    known_roles = ["Coven_Leader", "Siren", "Siren", "Medusa", "Medusa", "Poisoner", "Puppeteer", "Hex_Master", "Necromancer", "Potion_Master", "Mirage"]
-    correct = 0
-    for player_index in range(54,65):
-        if known_roles[player_index - 54] == role_names[role_indices_extended[assignment[player_index]]]:
-            correct += 1
-    return correct
-
 def generate_player_assignment(sus_matrix, role_counts):
     # Question: Given a suspicion matrix of priors, i.e. likelihood that each player is each role, pull a player distribution
     # Answer? For each possible combination, can compute the probability given the matrix, and then sample
@@ -74,12 +66,11 @@ def generate_player_assignment(sus_matrix, role_counts):
         for extended_role_index in range(num_players):
             sus_square[player_index,extended_role_index] = sus_matrix[player_index,role_indices_extended[extended_role_index]]
     
-    # Thermalization 
+    # From numerics, it seems that ~400 steps are required for 65 Player Thermalization
     # Generate Random Starting Point 
     assignment = np.random.permutation(range(num_players))
     current_energy = assignment_energy(assignment,sus_square)
-    positions = []
-    for t in range(10000):
+    for t in range(400):
         random_index = np.random.randint(num_players,size=2) # Random index permutation
         candidate_assignment = assignment.copy()
         candidate_assignment[random_index[0]] = assignment[random_index[1]]
@@ -89,12 +80,7 @@ def generate_player_assignment(sus_matrix, role_counts):
         if np.random.random() < np.exp(-temperature(t)*energy_difference):
             assignment = candidate_assignment
             current_energy = new_energy
-            positions.append([t,current_energy,check_assignment(assignment,role_indices_extended)])
-    positions = np.array(positions)
-    plt.plot(positions[:,0],(positions[:,1]-250)*5)
-    plt.plot(positions[:,0],positions[:,2]*10)
-    plt.savefig("graph.png")
-    print(check_assignment(assignment,role_indices_extended))
+
     # Match result with player assignment
     player_assignment = {}
     for player_index in range(num_players):
