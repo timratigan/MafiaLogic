@@ -1,62 +1,59 @@
-Investigator
-Lookout
-Psychic
-Sheriff
-Spy
-Tracker
-Killing Roles
-Jailer
-Vampire Hunter
-Vigilante
-Veteran
-Chef
-Protective Roles
-Bodyguard
-Doctor
-Crusader
-Trapper
-Priest
-Support Roles
-Hacker
-Therapist
-Escort
-Mayor
-Medium
-Retributionist
-Transporter
-Moosehead
-Godfather
-Mafioso
-Ambusher
-Bomber
-Deceptive Roles
-Lawyer
-Disguiser
-Janitor
-Hypnotist
-House Painter
-Support Roles
-Thug
-Bookie
-Consigliere
-Consort
-Coven Leader (Witch)
-Necromancer
-Poisoner
-Hex Master
-Siren
-Potion Master
-Medusa
-Puppeteer
-Mirage
-Amnesiac
-Apprentice
-Guardian Angel
-Survivor
-Pirate
-Executioner
-Jester
-Evil Roles
+Name            Team AP DP  Imm 
+Investigator    T   0   0       
+Lookout         T   0   0       
+Psychic         T   0   0       
+Sheriff         T   0   0       
+Spy             T   0   0   RCB     
+Tracker         T   0   0       
+Jailer          T   3   0       
+Vampire Hunter  T   2   0   B    
+Vigilante       T   1   0              
+Veteran         T   2   0   RC  
+Chef            T   3   0              
+Bodyguard       T   2   0       
+Doctor          T   0   0       
+Crusader        T   1   0       
+Trapper         T   2   0       
+Priest          T   0   0       
+Hacker          T   0   0   R       
+Therapist       T   0   0       
+Escort          T   0   0   R   
+Mayor           T   0   0
+Medium          T   0   0   RC  
+Retributionist  T   0   0       
+Transporter     T   0   0   RC
+Moosehead       T   0   0   RC
+Godfather       M   0   0       
+Mafioso         M   0   0     
+Ambusher        M   0   0     
+Bomber          M   0   0     
+Deceptive Roles M   0   0     
+Lawyer          M   0   0     
+Disguiser       M   0   0     
+Janitor         M   0   0     
+Hypnotist       M   0   0     
+House Painter   M   0   0     
+Support Roles   M   0   0     
+Thug            M   0   0     
+Bookie          M   0   0     
+Consigliere     M   0   0     
+Consort         M   0   0     
+Coven Leader    C   0   0     
+Necromancer     C   0   0     
+Poisoner        C   0   0     
+Hex Master      C   0   0     
+Siren           C   0   0     
+Potion Master   C   0   0     
+Medusa          C   0   0     
+Puppeteer       C   0   0     
+Mirage          C   0   0     
+Amnesiac        C   0   0     
+Apprentice      C   0   0     
+Guardian Angel  C   0   0     
+Survivor        C   0   0     
+Pirate          C   0   0     
+Executioner     C   0   0     
+Jester          C   0   0     
 Plaguebearer
 Pestilence
 Arsonist
