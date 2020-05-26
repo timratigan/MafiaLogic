@@ -1,12 +1,13 @@
 from load_data import *
 
-def simulate_game(player_assignment,known_player_states):
+def simulate_game(player_assignment,known_game_state):
     # Initalize Game State:
-    game_state = {"Environmental Variables":[0,"Night","Full"],"Player States":[]}
-    for player, role in player_assignment.items():
-        player_state = {"Name":player, "Role":role, "Alive":True}
-        game_state["Player States"].append(player_state)
+    game_state = known_game_state.copy()
+    print(game_state["Player States"]["Max Jerdee"])
+    for player_name, player_role in player_assignment.items():
+        game_state["Player States"][player_name]["Role"] = player_role
     print(game_state)
+    
     # Phases: Day, Night
     for day in range(2):
         if day != 0:

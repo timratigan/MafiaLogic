@@ -12,6 +12,10 @@ from extra_functions import *
 # defined as groups of players which may share information
 teams = ["T", "M", "C", "V", "S", "W"] # Town, Mafia, Coven, Vampires, Serial Killers, Werewolvs
 
+# (optional) Load in everything we KNOW about the 
+with open('files/known_game_state.json') as json_file:
+    known_game_state = json.load(json_file)
+
 roles = [] # full role information
 role_names = [] # names of roles
 role_teams = [] # number denoting the affiliation of each role
@@ -49,7 +53,5 @@ for role in roles:
     total_expected += float(role[5])
 if total_expected != num_players:
     print("Warning: # of players unequal to God expectations:", num_players, "!=",total_expected)
-
-known_game_state = json.loads('files/known_game_state.json')
 
 epsilon = 10**(-14)

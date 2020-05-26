@@ -1,6 +1,6 @@
 from load_data import *
 
-def generate_role_counts(GOD_RANDOMNESS=0.4,MIN_ROLE=1,MAX_ROLE=5,MAX_ROLE_MULT=2,known_assignments={},known_counts={},print_flag=False):
+def generate_role_counts(GOD_RANDOMNESS=0.4,MIN_ROLE=1,MAX_ROLE=5,MAX_ROLE_MULT=2,known_game_state={},known_counts={},print_flag=False):
     # Use God expectations to produce role numbers:
     role_counts = np.zeros(num_roles,dtype=int)
     # Generate a random role_count from normal distributions:
@@ -11,7 +11,7 @@ def generate_role_counts(GOD_RANDOMNESS=0.4,MIN_ROLE=1,MAX_ROLE=5,MAX_ROLE_MULT=
     # Enforce minimum/maximum roles:
     role_counts = np.minimum(np.maximum(MIN_ROLE*np.ones(num_roles),role_counts),MAX_ROLE*np.ones(num_roles))
    
-    # Enforce the unique/none roles and :
+    # Enforce the unique/none roles and known role counts:
     for unique_role in unique_roles:
         role_counts[role_names.index(unique_role)] = 1
     for none_role in none_roles:
