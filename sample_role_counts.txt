@@ -1,0 +1,59 @@
+GOD_RANDOMNESS = 0.4 # Assume that each role appears with \pm GOD_RANDOMNESS*100 %. 
+MIN_ROLE = 0 # Option to force a minimum number of players in each role
+MAX_ROLE = 5 # Option to force a maximum number of players in each role
+MAX_ROLE_MULT = 2 # Option to force a maximum number of players in each role as a multiple of the average for the role
+{'Investigator': 0, 'Psychic': 0, 'Vampire_Hunter': 0, 'Vigilante': 2, 'Priest': 2, 'Lawyer': 2, 'Thug': 0, 'Consort': 2, 'Siren': 2, 'Medusa': 2, 'Pirate': 0, 'Executioner': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Tracker': 0, 'Vigilante': 2, 'Trapper': 0, 'Priest': 0, 'Retributionist': 2, 'Moosehead': 2, 'Hypnotist': 2, 'House_Painter': 0, 'Consigliere': 2, 'Siren': 2, 'Medusa': 2, 'Guardian_Angel': 2, 'Pestilence': 0}
+{'Bodyguard': 2, 'Escort': 2, 'Retributionist': 0, 'Transporter': 2, 'Janitor': 2, 'Siren': 2, 'Medusa': 2, 'Apprentice': 0, 'Guardian_Angel': 0, 'Executioner': 0, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Vigilante': 2, 'Bodyguard': 0, 'Doctor': 2, 'Trapper': 0, 'Ambusher': 2, 'Disguiser': 2, 'Hypnotist': 2, 'House_Painter': 0, 'Thug': 0, 'Consort': 0, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Vigilante': 0, 'Chef': 2, 'Crusader': 2, 'Lawyer': 2, 'Siren': 2, 'Medusa': 2, 'Jester': 0, 'Pestilence': 0, 'Werewolf': 2}
+{'Crusader': 0, 'Trapper': 2, 'Priest': 0, 'Therapist': 0, 'Lawyer': 2, 'Disguiser': 2, 'Janitor': 0, 'Hypnotist': 2, 'Consigliere': 0, 'Siren': 2, 'Medusa': 2, 'Guardian_Angel': 2, 'Pestilence': 0, 'Arsonist': 0, 'Serial_Killer': 2, 'Werewolf': 2, 'Vampire': 2}
+{'Bodyguard': 0, 'Trapper': 2, 'Transporter': 0, 'Janitor': 2, 'Siren': 2, 'Medusa': 2, 'Pirate': 2, 'Executioner': 0, 'Pestilence': 0, 'Werewolf': 2, 'Vampire': 2}
+{'Sheriff': 2, 'Doctor': 0, 'Transporter': 2, 'Moosehead': 0, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 3}
+{'Vampire_Hunter': 0, 'Vigilante': 0, 'Trapper': 0, 'Escort': 0, 'Bomber': 2, 'Janitor': 0, 'Hypnotist': 2, 'House_Painter': 2, 'Bookie': 2, 'Siren': 2, 'Medusa': 2, 'Guardian_Angel': 2, 'Survivor': 0, 'Pirate': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Tracker': 0, 'Doctor': 0, 'Retributionist': 0, 'Transporter': 2, 'Ambusher': 2, 'Bomber': 2, 'Janitor': 0, 'House_Painter': 2, 'Consigliere': 2, 'Siren': 2, 'Medusa': 2, 'Amnesiac': 0, 'Pestilence': 0, 'Werewolf': 2, 'Vampire': 2}
+
+GOD_RANDOMNESS = 0.4 # Assume that each role appears with \pm GOD_RANDOMNESS*100 %. 
+MIN_ROLE = 1 # Option to force a minimum number of players in each role
+MAX_ROLE = 5 # Option to force a maximum number of players in each role
+MAX_ROLE_MULT = 2 # Option to force a maximum number of players in each role as a multiple of the average for the role
+{'Hypnotist': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2}
+{'Bomber': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Vampire': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2, 'Vampire': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2, 'Vampire': 2}
+{'Janitor': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2}
+{'Lookout': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2}
+{'Chef': 2, 'Consort': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Vampire': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Vampire': 2}
+
+GOD_RANDOMNESS = 0.3 # Assume that each role appears with \pm GOD_RANDOMNESS*100 %. 
+MIN_ROLE = 0 # Option to force a minimum number of players in each role
+MAX_ROLE = 5 # Option to force a maximum number of players in each role
+MAX_ROLE_MULT = 2 # Option to force a maximum number of players in each role as a multiple of the average for the role
+{'Doctor': 2, 'Siren': 2, 'Medusa': 2, 'Survivor': 2, 'Pestilence': 0}
+{'Transporter': 2, 'Lawyer': 2, 'Siren': 2, 'Medusa': 2, 'Pirate': 0, 'Pestilence': 0, 'Vampire': 2}
+{'Janitor': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Vampire': 2}
+{'Investigator': 0, 'Lawyer': 2, 'Bookie': 2, 'Siren': 2, 'Medusa': 2, 'Survivor': 2, 'Pestilence': 0}
+{'Bomber': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2}
+{'Crusader': 0, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2, 'Vampire': 2}
+{'Psychic': 0, 'Crusader': 2, 'Disguiser': 2, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Vampire': 2}
+{'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Werewolf': 2, 'Vampire': 2}
+{'Bomber': 2, 'Consigliere': 0, 'Siren': 2, 'Medusa': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Vampire': 2}
+
+GOD_RANDOMNESS = 0.5 # Assume that each role appears with \pm GOD_RANDOMNESS*100 %. 
+MIN_ROLE = 0 # Option to force a minimum number of players in each role
+MAX_ROLE = 5 # Option to force a maximum number of players in each role
+MAX_ROLE_MULT = 2 # Option to force a maximum number of players in each role as a multiple of the average for the role
+{'Psychic': 2, 'Priest': 2, 'Retributionist': 0, 'Moosehead': 2, 'Ambusher': 2, 'Hypnotist': 0, 'Bookie': 2, 'Consort': 0, 'Siren': 2, 'Medusa': 2, 'Guardian_Angel': 0, 'Executioner': 0, 'Jester': 2, 'Pestilence': 0, 'Werewolf': 2}
+{'Lookout': 2, 'Tracker': 0, 'Hacker': 0, 'Therapist': 0, 'Escort': 2, 'Retributionist': 2, 'Transporter': 0, 'Ambusher': 0, 'Disguiser': 2, 'Siren': 2, 'Medusa': 2, 'Apprentice': 0, 'Jester': 2, 'Pestilence': 0, 'Serial_Killer': 3, 'Werewolf': 2}
+{'Bodyguard': 2, 'Retributionist': 0, 'Bomber': 2, 'Lawyer': 0, 'Disguiser': 0, 'Hypnotist': 2, 'Siren': 2, 'Medusa': 2, 'Executioner': 2, 'Pestilence': 0, 'Arsonist': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Psychic': 2, 'Sheriff': 2, 'Vampire_Hunter': 0, 'Vigilante': 2, 'Bodyguard': 0, 'Doctor': 0, 'Retributionist': 2, 'Transporter': 0, 'Disguiser': 2, 'Hypnotist': 2, 'Thug': 2, 'Consort': 0, 'Siren': 2, 'Medusa': 2, 'Apprentice': 0, 'Pestilence': 0, 'Werewolf': 2}
+{'Investigator': 0, 'Chef': 2, 'Bodyguard': 2, 'Crusader': 0, 'Trapper': 2, 'Therapist': 2, 'Retributionist': 0, 'Lawyer': 0, 'Disguiser': 0, 'Janitor': 2, 'Thug': 0, 'Consigliere': 2, 'Siren': 2, 'Medusa': 2, 'Amnesiac': 0, 'Guardian_Angel': 0, 'Jester': 2, 'Pestilence': 0, 'Arsonist': 2, 'Serial_Killer': 2, 'Vampire': 2}
+{'Psychic': 0, 'Sheriff': 2, 'Chef': 2, 'Crusader': 0, 'Priest': 0, 'Disguiser': 2, 'Hypnotist': 2, 'Bookie': 2, 'Siren': 2, 'Medusa': 2, 'Apprentice': 0, 'Guardian_Angel': 2, 'Jester': 0, 'Pestilence': 0, 'Werewolf': 2}
+{'Psychic': 0, 'Sheriff': 2, 'Priest': 0, 'Ambusher': 0, 'Bomber': 2, 'Lawyer': 2, 'Hypnotist': 2, 'House_Painter': 0, 'Siren': 2, 'Medusa': 2, 'Amnesiac': 2, 'Apprentice': 0, 'Guardian_Angel': 0, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2, 'Vampire': 2}
+{'Doctor': 2, 'Priest': 0, 'Escort': 0, 'Transporter': 0, 'Janitor': 2, 'Siren': 2, 'Medusa': 2, 'Amnesiac': 2, 'Pestilence': 0, 'Serial_Killer': 2, 'Werewolf': 2}
+{'Investigator': 2, 'Bodyguard': 0, 'Priest': 0, 'Disguiser': 2, 'Janitor': 2, 'Hypnotist': 2, 'Consigliere': 0, 'Siren': 2, 'Medusa': 2, 'Guardian_Angel': 0, 'Pestilence': 0, 'Werewolf': 3}
+{'Lookout': 0, 'Psychic': 2, 'Crusader': 0, 'Lawyer': 2, 'Janitor': 2, 'Thug': 0, 'Siren': 2, 'Medusa': 2, 'Apprentice': 2, 'Pestilence': 0, 'Vampire': 2}
