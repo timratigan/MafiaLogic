@@ -40,4 +40,4 @@ for role in roles:
 if total_expected != num_players:
     print("Warning: # of players unequal to God expectations", total_expected, num_players)
 
-epsilon = 10**(-10)
+epsilon = 10**(-14)

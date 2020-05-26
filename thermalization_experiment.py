@@ -17,9 +17,9 @@ np.random.seed(0)
 # N = 65 -> ~400
 
 N = 8
-thermalization = 100
-trials = 200
-runs = 200
+thermalization = 10
+trials = 10
+runs = 2
 
 def assignment_probability(assignment,sus_square):
     probability = 1
@@ -43,17 +43,19 @@ np.set_printoptions(formatter={'float_kind':float_formatter})
 def simple_sample(sus_square):
     assignment = list(range(N))
     square = sus_square.copy()
-    for player_index in range(N):
+    polarization_order = sorted(range(N),key=lambda x: np.std(square[x,:]),reverse=True)
+    for player_index in polarization_order:
         square[player_index,:] = np.cumsum(square[player_index,:])
         rand = np.random.random()*square[player_index,N-1]
-        assignment[player_index] = bisect_right(square[player_index,:],rand)
+        assignment[player_index] = min(bisect_right(square[player_index,:],rand),N-1)
         square[:,assignment[player_index]] = np.zeros(N)
     return assignment
 
 sus_square = np.random.rand(N,N)
 # Include known submatrix
-for i in range(N):
-    sus_square[i,i] *= 10
+for i in range(4,N):
+    sus_square[i,] = np.zeros(N)
+    sus_square[i,i] = 1
 
 # compare encounters with expected encounters
 expected_encounters = {}
@@ -110,6 +112,7 @@ plt.plot(np.log(list(encounters.values())),np.log(list(encounters.values())), co
 plt.savefig("graph2.png")
 
 for t in range(runs*trials):
+    print(tuple(simple_sample(sus_square)))
     simple_encounters[tuple(simple_sample(sus_square))] += 1
 
 plt.clf()
