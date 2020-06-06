@@ -37,6 +37,7 @@ class Team(Enum):
     NeutralChaos = 5
     NeutralEvil = 6
     Hate = 7
+    Vampire = 8
 
 
 class Priority(Enum):
@@ -64,6 +65,10 @@ class TimeOfDay(Enum):
     Night = 3
 
 
+def noop(*args, **kwargs):
+    return
+
+
 class Game(object, metaclass=abc.ABCMeta):
     def __init__(self):
         self.players: Dict[int, Player] = {}
@@ -79,7 +84,7 @@ class Game(object, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def add_action(self, cb, priority, args=None, kwargs=None) -> None:
+    def add_action(self, player, cb, priority, args=None, kwargs=None) -> None:
         pass
 
     @abc.abstractmethod
@@ -104,7 +109,8 @@ class Player(object):
         self.doused: bool = False
         self.defense = 0
 
-        self.queued_actions: list = []
+        self._queued_action = None
+        self._messages = defaultdict(list)
 
     def day_action(self, *args, **kwargs) -> None:
         pass
@@ -116,3 +122,10 @@ class Player(object):
     def is_good(self):
         return self.TEAM in [Team.Town, Team.NeutralBenign, Team.Hate] and \
                self.role not in ['Anarchist', 'HexMaster', 'Arsonist']
+
+    def submit(self, message):
+        self._messages[self.game.night].append(message)
+
+    def reset_action(self):
+        if self._queued_action:
+            self._queued_action[1] = noop

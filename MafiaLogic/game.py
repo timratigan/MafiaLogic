@@ -1,12 +1,11 @@
 from abc import ABC
 from collections import defaultdict
-from sortedcontainers import SortedList
-from typing import Union, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 
 from MafiaLogic.common import Game, TimeOfDay, Player, Team, Priority
-import MafiaLogic
+import MafiaLogic.roles
 
 
 class MafiaGame(Game, ABC):
@@ -40,11 +39,15 @@ class MafiaGame(Game, ABC):
                     i += 1
 
     def start(self):
-        while not self._parse(input('')):
+        while not self._parse(input()):
             pass
 
-    def add_action(self, cb, priority, args=None, kwargs=None) -> None:
-        self._action_queue[priority.value].append([cb, args, kwargs])
+    def add_action(self, player: Player, cb, priority: Priority, args=None, kwargs=None) -> None:
+        player._queued_action = [player, cb, args, kwargs]
+        self._action_queue[priority].append(player._queued_action)
+
+    def get_player(self, player_id) -> Player:
+        return self.players[player_id]
 
     def _advance(self):
         for x in self._message_buffer:
@@ -54,11 +57,8 @@ class MafiaGame(Game, ABC):
         self.time_of_day = TimeOfDay(
             (self.time_of_day.value + 1) % len(TimeOfDay))
         if self.time_of_day == TimeOfDay.Trial:
-            for voter, vote in self._votes:
-                print(f'{voter.name} voted for {vote}')
             self._votes = []
-            winner = max(self._vote_counts.items(), key=lambda t: t[1])[0]
-            self._nominee = self.get_player(winner)
+            self._nominee = max(self._vote_counts.items(), key=lambda t: t[1])[0]
             print(f'{self._nominee.name} is on trial!')
             self._vote_counts = defaultdict(int)
         elif self.time_of_day == TimeOfDay.Night:
@@ -68,26 +68,21 @@ class MafiaGame(Game, ABC):
             winner = max(self._vote_counts.items(), key=lambda t: t[1])[0]
             if winner:
                 self._kill(self._nominee)
-                print(f'{self._nominee} has been guillotined!')
+                print(f'{self._nominee.name} has been guillotined!')
             else:
-                print(f'the town has decided not to guillotine {self._nominee}!')
+                print(f'the town has decided not to guillotine {self._nominee.name}!')
             self._vote_counts = defaultdict(int)
         elif self.time_of_day == TimeOfDay.Morning:
+            self.night += 1
             for priority in Priority:
                 actions = self._action_queue[priority]
-                for cb, args, kwargs in actions:
+                for action in actions:
+                    if not action:
+                        continue
+                    player, cb, args, kwargs = action
                     cb(*args, **kwargs)
+                    player.reset_action()
             self._action_queue = defaultdict(list)
-
-        team = None
-        for player in self.players.values():
-            if team is None:
-                team = player.TEAM
-            else:
-                if team != player.TEAM or team in [Team.NeutralBenign,
-                                                   Team.NeutralChaos,
-                                                   Team.NeutralEvil]:
-                    break
 
     def _kill(self, player: Player):
         del self.players[player.id]
@@ -95,6 +90,7 @@ class MafiaGame(Game, ABC):
         self.players_by_team[player.TEAM].remove(player)
         self.dead_players[player.id] = player
         self.dead_players_by_name[player.name] = player
+        player.reset_action()
 
     def _vote(self, voter, vote):
         self._votes.append([voter, vote])
@@ -104,12 +100,14 @@ class MafiaGame(Game, ABC):
         args = list(filter(''.__ne__, args.split(' ')))
         if not args:
             return
+        for i, arg in enumerate(args):
+            try:
+                args[i] = int(arg)
+            except ValueError:
+                pass
 
         if args[0] == 'action':
-            try:
-                player_id = int(args[1])
-            except ValueError:
-                player_id = args[1]
+            player_id = args[1]
             player = self.get_player(player_id)
             action_args = args[2:]
             if self.time_of_day != TimeOfDay.Night:
@@ -120,15 +118,12 @@ class MafiaGame(Game, ABC):
             self._advance()
         elif args[0] == 'vote':
             assert self.time_of_day in [TimeOfDay.Nomination, TimeOfDay.Trial]
-            try:
-                player_id = int(args[1])
-            except ValueError:
-                player_id = args[1]
+            player_id = args[1]
             voter = self.get_player(player_id)
             if self.time_of_day == TimeOfDay.Nomination:
-                try:
-                    player_id = int(args[2])
-                except ValueError:
-                    player_id = args[2]
+                player_id = args[2]
                 vote = self.get_player(player_id)
                 self._vote(voter, vote)
+                print(f'{voter.name} voted for {vote}')
+            else:
+                self._vote(voter, bool(args[2]))
