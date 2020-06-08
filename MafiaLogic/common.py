@@ -1,27 +1,21 @@
-import abc
+from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from enum import Enum
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Callable
 
 INVEST_SETS = frozenset({
-    frozenset({'Investigator', 'Psychic', 'Consigliere', 'Navigator'}),
-    frozenset({'Lookout', 'Scientist', 'CovenLeader', 'Cupid'}),
-    frozenset({'Sheriff', 'Executioner', 'Werewolf'}),
-    frozenset({'Tracker', 'Mayor', 'Plaguebearer', 'Amnesiac'}),
-    frozenset({'Spy', 'Blackmailer', 'Puppeteer'}),
-    frozenset({'Archivist', 'Medusa', 'Janitor', 'CabinBoy'}),
-    frozenset({'Jailor', 'QuarterMaster', 'GuardianAngel'}),
-    frozenset({'Vigilante', 'Ambusher', 'Captain'}),
-    frozenset({'Veteran', 'Bomber', 'Survivor'}),
-    frozenset({'Chef', 'Poisoner', 'Juggernaut'}),
-    frozenset({'Bodyguard', 'Crusader', 'Godfather', 'Arsonist'}),
-    frozenset({'Doctor', 'PotionMaster', 'Quack'}),
-    frozenset({'Transporter', 'Trapper', 'Hypnotist', 'Smuggler'}),
-    frozenset({'Escort', 'Consort', 'Siren', 'Thief'}),
-    frozenset({'Medium', 'Retributionist', 'Necromancer'}),
-    frozenset({'Lawyer', 'HexMaster', 'Vampire', 'Jester'}),
-    frozenset({'Spy', 'Blackmailer', 'Puppeteer'}),
-    frozenset({'Anarchist', 'Bishop', 'Deputy', 'Admiral'})
+    frozenset({'Investigator', 'Psychic', 'Consigliere', 'Mayor', 'Survivor', 'Plaguebearer'}),
+    frozenset({'Escort', 'Consort', 'Siren', 'Lookout', 'SerialKiller'}),
+    frozenset({'VampireHunter', 'Amnesiac', 'Medusa', 'Psychic', 'Disguiser'}),
+    frozenset({'Sheriff', 'Executioner', 'Werewolf', 'Janitor', 'Moosehead'}),
+    frozenset({'Doctor', 'Spy', 'Lawyer', 'PotionMaster', 'HexMaster'}),
+    frozenset({'Puppeteer', 'Hacker', 'Eros', 'Tracker', 'Hypnotist'}),
+    frozenset({'Jailor', 'Chef', 'Poisoner', 'GuardianAngel', 'CovenLeader'}),
+    frozenset({'Vigilante', 'Veteran', 'Pirate', 'Mafioso', 'Ambusher'}),
+    frozenset({'Bodyguard', 'Godfather', 'Medium', 'Crusader', 'Thug'}),
+    frozenset({'Arsonist', 'Retributionist', 'Necromancer', 'Trapper', 'Bomber'}),
+    frozenset({'Bookie', 'Priest', 'Vampire', 'Jester'}),
+    frozenset({'Transporter', 'HousePainter', 'Therapist', 'Mirage', 'Apprentice'})
 })
 
 
@@ -41,6 +35,7 @@ class Team(Enum):
 
 
 class Priority(Enum):
+    Antecedent = -1
     Immediate = 0
     Controlling = 1
     Duel = 2
@@ -69,33 +64,50 @@ def noop(*args, **kwargs):
     return
 
 
-class Game(object, metaclass=abc.ABCMeta):
+class Game(object, metaclass=ABCMeta):
     def __init__(self):
         self.players: Dict[int, Player] = {}
         self.dead_players: Dict[int, Player] = {}
         self.players_by_team: Dict[Team, List[Player]] = defaultdict(list)
         self.players_by_name: Dict[Union[int, str], Player] = {}
+        self.players_by_role: Dict[str, List[Player]] = defaultdict(list)
         self.dead_players_by_name: Dict[Union[int, str], Player] = {}
         self.night: int = 0
         self.time_of_day: TimeOfDay = TimeOfDay.Night
 
-    @abc.abstractmethod
-    def start(self):
+    @abstractmethod
+    def add_action(self, player: 'Player', cb: Callable, priority: Priority, *args, **kwargs) -> None:
         pass
 
-    @abc.abstractmethod
-    def add_action(self, player, cb, priority, args=None, kwargs=None) -> None:
+    def queue(self, cb: Callable, tod: TimeOfDay, *args, **kwargs):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_player(self, player_id) -> 'Player':
+        pass
+
+    @abstractmethod
+    def attack(self, attacker: 'Player', attackee: 'Player', strength: int):
+        pass
+
+    @abstractmethod
+    def kill(self, player: 'Player'):
+        pass
+
+    def change_roles(self, player: 'Player', role: str):
         pass
 
 
 class Player(object):
     # attributes that should be modified by the subclass
-    TEAM = Team.NeutralBenign
-    IS_UNIQUE = False
+    TEAM: Team = Team.NeutralBenign
+    PRIORITY: Priority = Priority.StartDay
+    DETECTION_IMMUNITY = False
+    ROLEBLOCK_IMMUNITY = False
+    BITE_IMMUNITY = False
+    CONTROL_IMMUNITY = False
+    DEFENSE = 0
+    UNIQUE = False
 
     def __init__(self, game: Game, player_id, name=None):
         self.game: Game = game
@@ -107,16 +119,18 @@ class Player(object):
         self.hexed: bool = False
         self.infected: bool = False
         self.doused: bool = False
-        self.defense = 0
+        self.poisoned = 0
+        self.healed = False
 
         self._queued_action = None
         self._messages = defaultdict(list)
 
-    def day_action(self, *args, **kwargs) -> None:
-        pass
+        self._visited_by = []
+        self._visited = []
 
-    def at_night(self, *args, **kwargs) -> None:
-        pass
+    def add_action(self, *args, **kwargs):
+        cb = self.night_action if self.game.time_of_day == TimeOfDay.Night else self.day_action
+        self.game.add_action(self, cb, self.PRIORITY, *args, **kwargs)
 
     @property
     def is_good(self):
@@ -129,3 +143,63 @@ class Player(object):
     def reset_action(self):
         if self._queued_action:
             self._queued_action[1] = noop
+        self._queued_action = None
+
+    def visit(self, player: 'Player') -> bool:
+        self._visited.append(player)
+        plaguebearers = self.game.players_by_role['Plaguebearer']
+        if self.infected and not player.infected:
+            player.infected = True
+            for plaguebearer in plaguebearers:
+                plaguebearer.submit(f'{player.name} infected')
+        elif player.infected and not self.infected:
+            self.infected = True
+            for plaguebearer in plaguebearers:
+                plaguebearer.submit(f'{self.name} infected')
+        return player.visited_by(self)
+
+    def visited_by(self, player: 'Player') -> bool:  # return whether visiting should end the action
+        self._visited_by.append(player)
+        return False
+
+    def attack(self, player: 'Player', strength: int):
+        self.game.attack(self, player, strength)
+
+    def rampage(self, player: 'Player', strength: int):
+        self.attack(player, strength)
+        for visitor in player._visited_by:
+            if visitor.__class__.__name__ != 'Tracker':
+                self.attack(visitor, strength)
+
+    def heal(self, defense=2):
+        self.DEFENSE = max(defense, self.DEFENSE)
+        self.healed = True
+        if self.poisoned:
+            self.submit('You were healed of poison')
+            self.poisoned = 0
+        self.game.queue(self._reset_def, TimeOfDay.Morning)
+
+    def _reset_def(self):
+        self.DEFENSE = self.__class__.DEFENSE
+        self.healed = False
+
+    def poison(self):
+        self.submit('You were poisoned')
+        self.poisoned = max(self.poisoned, 1)
+        self.game.queue(self._poison, TimeOfDay.Morning)
+
+    def _poison(self):
+        if not self.poisoned:
+            return
+        if self.poisoned > 1:
+            self.game.kill(self)
+            return
+        self.poisoned += 1
+        self.game.queue(self._poison, TimeOfDay.Morning)
+
+    night_action = noop
+
+    day_action = noop
+
+    def __repr__(self):
+        return str(self.name)
