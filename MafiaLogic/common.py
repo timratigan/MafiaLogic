@@ -100,6 +100,7 @@ class Player(object):
     TEAM = Team.NeutralBenign
     IS_UNIQUE = False
     default_defense = defense_power = 0
+    vests = 0
     attack_power = 0
     detection_immunity = False
     bite_immunity = False
@@ -117,7 +118,7 @@ class Player(object):
         self.hexed: bool = False
         self.framed: bool = False
         self.bribed: bool = False
-        self.poisoned: bool = False
+        self.bribed: bool = False
         self.infected: bool = False
         self.will_suicide: bool = False
         # Dict of Player:active, where active is a bool
