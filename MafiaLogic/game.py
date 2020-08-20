@@ -1,6 +1,6 @@
 from abc import ABC
 from collections import defaultdict
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Union
 
 import numpy as np
 
@@ -19,6 +19,7 @@ class MafiaGame(Game, ABC):
         self._message_buffer = []
         self._votes = []
         self._vote_counts = defaultdict(int)
+        self._nominee = None
 
         if names:
             names = np.random.permutation(names)
@@ -28,17 +29,14 @@ class MafiaGame(Game, ABC):
             for count, role in roles:
                 for _ in range(count):
                     name = names[i] if names else None
-                    player = getattr(MafiaLogic.roles, role)(
-                        game=self,
-                        player_id=i,
-                        name=name)
-                    if player.IS_UNIQUE:
+                    player = getattr(MafiaLogic.roles, role)(game=self, player_id=i, name=name)
+                    if player.UNIQUE:
                         assert count == 1
-                    self.players[i] = player
                     self.players_by_team[player.TEAM].append(player)
-                    self.players_by_role[player.role].append(player)
                     self.players_by_name[player.name] = player
                     i += 1
+        for player in self.players_by_name:
+            self.players[player.id] = player
 
     def start(self):
         while not self._parse(input()):
@@ -51,11 +49,17 @@ class MafiaGame(Game, ABC):
     def queue(self, cb: Callable, tod: TimeOfDay, *args, **kwargs):
         self._tod_queue[tod].append([cb, args, kwargs])
 
-    def get_player(self, player_id) -> Player:
-        return self.players[player_id]
+    def get_player(self, player_id: Union[int, str, Player]) -> Player:
+        if isinstance(player_id, Player):
+            return player_id
+        if isinstance(player_id, str):
+            return self.players_by_name[player_id]
+        if isinstance(player_id, int):
+            return self.players[player_id]
+        raise AssertionError
 
-    def attack(self, attacker: Player, attackee: Player, strength: int):
-        if attacker.visit(attackee):
+    def attack(self, attacker: Player, attackee: Player, strength: int, visit=True):
+        if visit and attacker.visit(attackee, attacking=True):
             return
         if strength > attackee.DEFENSE:
             self.kill(attackee)
@@ -76,20 +80,16 @@ class MafiaGame(Game, ABC):
         # noinspection PyTypeChecker
         self.time_of_day = TimeOfDay(
             (self.time_of_day.value + 1) % len(TimeOfDay))
-        tod_queue = self._tod_queue[self.time_of_day]
-        self._tod_queue[self.time_of_day] = []
-        for cb, args, kwargs in tod_queue:
-            cb(*args, **kwargs)
         if self.time_of_day == TimeOfDay.Trial:
             self._votes = []
-            self._nominee = max(self._vote_counts.items(), key=lambda t: t[1])[0]
+            self._nominee = max(self._vote_counts.items(), key=lambda t: t[1])[0] if self._vote_counts else None
             print(f'{self._nominee.name} is on trial!')
             self._vote_counts = defaultdict(int)
-        elif self.time_of_day == TimeOfDay.Night:
+        elif self.time_of_day == TimeOfDay.Night and self._nominee is not None:
             for voter, vote in self._votes:
                 print(f'{voter.name} voted for {vote}')
             self._votes = []
-            winner = max(self._vote_counts.items(), key=lambda t: t[1])[0]
+            winner = max(self._vote_counts.items(), key=lambda t: t[1])[0] if self._vote_counts else None
             if winner:
                 self.kill(self._nominee)
                 print(f'{self._nominee.name} has been guillotined!  They were {self._nominee.role}')
@@ -102,15 +102,18 @@ class MafiaGame(Game, ABC):
                 actions = self._action_queue[priority]
                 for action in actions:
                     player, cb, args, kwargs = action
-                    cb(*args, **kwargs)
                     player.reset_action()
+                    cb(*args, **kwargs)
             self._action_queue = defaultdict(list)
+        tod_queue = self._tod_queue[self.time_of_day]
+        self._tod_queue[self.time_of_day] = []
+        for cb, args, kwargs in tod_queue:
+            cb(*args, **kwargs)
 
     def kill(self, player: Player):
         del self.players[player.id]
         del self.players_by_name[player.name]
         self.players_by_team[player.TEAM].remove(player)
-        self.players_by_role[player.__class__.__name__].remove(player)
         self.dead_players[player.id] = player
         self.dead_players_by_name[player.name] = player
         player.reset_action()
