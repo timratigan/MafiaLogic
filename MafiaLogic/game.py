@@ -7,7 +7,6 @@ import numpy as np
 from MafiaLogic.common import Game, TimeOfDay, Player, Team, Priority
 import MafiaLogic.roles
 
-
 class MafiaGame(Game, ABC):
     def __init__(self,
                  roles: List[Tuple[int, str]] = None,
@@ -19,14 +18,17 @@ class MafiaGame(Game, ABC):
         self._votes = []
         self._vote_counts = defaultdict(int)
 
-        if names:
+        """
+        Name-randomization
+        if names is not None:
             names = np.random.permutation(names)
+        """
 
         i = 0
-        if roles:
+        if roles is not None:
             for count, role in roles:
                 for _ in range(count):
-                    name = names[i] if names else None
+                    name = names[i] if names is not None else None
                     player = getattr(MafiaLogic.roles, role)(
                         game=self,
                         player_id=i,
@@ -80,16 +82,21 @@ class MafiaGame(Game, ABC):
                     if not action:
                         continue
                     player, cb, args, kwargs = action
-                    cb(*args, **kwargs)
-                    player.reset_action()
+                    if not player.jailed and player.alive:
+                        cb(*args, **kwargs)
+            for player in self.players:
+                self.get_player(player).reset_action()
+                self.get_player(player).reset_status()
             self._action_queue = defaultdict(list)
 
+    def print_status(self):
+        print('Night:', self.night, 'Time:', self.time_of_day, 'Full Moon?:', self.full_moon)
+        print('Messages:')
+        for player in self.players.values():
+            print(player.name + ':',list(player._messages.values()))
+
     def _kill(self, player: Player):
-        del self.players[player.id]
-        del self.players_by_name[player.name]
-        self.players_by_team[player.TEAM].remove(player)
-        self.dead_players[player.id] = player
-        self.dead_players_by_name[player.name] = player
+        player.alive = False
         player.reset_action()
 
     def _vote(self, voter, vote):
@@ -124,6 +131,11 @@ class MafiaGame(Game, ABC):
                 player_id = args[2]
                 vote = self.get_player(player_id)
                 self._vote(voter, vote)
-                print(f'{voter.name} voted for {vote}')
+                print(f'{voter.name} voted to nominate {vote}')
             else:
-                self._vote(voter, bool(args[2]))
+                if args[2] == 'Guilty':
+                    self._vote(voter, True)
+                elif args[2] == 'Innocent':
+                    self._vote(voter, False)
+                else:
+                    print('vote input error')
