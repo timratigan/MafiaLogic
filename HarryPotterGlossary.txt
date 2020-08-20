@@ -34,4 +34,3 @@ Jester -> Poltergeist
 Plaguebearer -> Obscurus
 Pestilence -> Fatal Obscurus
 Serial Killer -> Grim
-Arsonist -> Enforcer

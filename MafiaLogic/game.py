@@ -80,18 +80,45 @@ class MafiaGame(Game, ABC):
             self._vote_counts = defaultdict(int)
         elif self.time_of_day == TimeOfDay.Morning:
             self.night += 1
+            swapped_ids = {}
+            for player in self.players:
+                swapped_ids[player] = player
             for priority in Priority:
                 actions = self._action_queue[priority]
                 for action in actions:
                     if not action:
                         continue
                     player, cb, args, kwargs = action
-                    if (not player.jailed and player.alive) or priority == Priority.CleanUp:
-                        cb(*args, **kwargs)
+                    # Mess with targets (first control, then account for swaps)
+                    swapped_args = []
+                    for i in range(len(args)):
+                        arg = args[i]
+                        if isinstance(arg,int) and arg < 1000: #We use this to differentiate between team and player arguments
+                            if player.control_id != -1 and not player.control_immunity:
+                                arg = player.control_id
+                            swapped_args.append(swapped_ids[arg])
+                        else:
+                            swapped_args.append(arg)
+                    if (not player.jailed and player.alive and not player.roleblocked) or priority == Priority.CleanUp:
+                        cb(*swapped_args, **kwargs)
+
+                # After swaps are entered, we randomize (kinda) and update the swapped_ids permutation
+                if priority == Priority.Transport: 
+                    if self.random() > 0.5: # Assuming there isn't going to be more than two swaps...
+                        self.swaps.reverse()
+                    for swap in self.swaps:
+                        temp = swapped_ids[swap[0]]
+                        swapped_ids[swap[0]] = swapped_ids[swap[1]]
+                        swapped_ids[swap[1]] = temp
+
             for player in self.players:
                 self.get_player(player).reset_action()
                 self.get_player(player).reset_status()
+            self.reset_game_status()
             self._action_queue = defaultdict(list)
+
+    def reset_game_status(self):
+        self.swaps = []
 
     def print_status(self):
         print('Night:', self.night, 'Time:', self.time_of_day, 'Full Moon?:', self.full_moon)

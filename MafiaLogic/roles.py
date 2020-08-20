@@ -9,6 +9,8 @@ from MafiaLogic.common import Player, Game, Team, INVEST_RESULTS, Priority
 ########################
 class Investigator(Player):
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'investigate':
@@ -31,6 +33,8 @@ class Tracker(Player):
     On full moon nights: choose a person to watch. You see the people they visit that night.
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
     
     def at_night(self, action ,*args, **kwargs):
         if action == 'track':
@@ -75,6 +79,8 @@ class Psychic(Player):
     On full moon nights: get two random names, at least one of which is good.
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
 
     def at_night(self, action, *args, **kwargs):
         if action == 'full_commune':
@@ -105,6 +111,7 @@ class Psychic(Player):
         for player in perm:
             if player.is_good:
                 results.add(player)
+                break
         results.add(np.random.choice(player_list))
         self.submit(f'one of players {results} is good')
 
@@ -113,6 +120,8 @@ class Sheriff(Player):
     Choose one person to investigate. You see whether they are suspicious or not.  (BINARY ANSWER)
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'investigate':
@@ -141,6 +150,8 @@ class Spy(Player):
     Choose to spy on Mafia, Coven, or Werewolves. Receive bits of their conversation in the morning
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'spy':
@@ -158,12 +169,15 @@ class Jailor(Player):
     If role-blocked or controlled, they jail but do not execute.	Unique role. If on any night but N0 you fail to execute a SK or WW (full moon only), they attack you.
     """
     TEAM = Team.Town
-    attack_power = 3
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 3
 
     def at_night(self, action,*args, **kwargs):
         if action == 'jail':
             self.game.add_action(self, self.jail, Priority.PrevDay, args, kwargs)
         elif action == 'execute':
+            assert self.game.night > 0
             self.game.add_action(self, self.execute, Priority.Kill, args, kwargs)
         else:
             print('Action', action,'not found for',self.__class__.__name__)
@@ -196,7 +210,9 @@ class Werewolf_Hunter(Player):
     Can listen in on the werewolf chat	2	0	Bite immune and kills werewolf		Werewolf Hunter, Basilisk, Seer, Polyjuice Potioneer
     """
     TEAM = Team.Town
-    attack_power = 2
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 2
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'investigate':
@@ -219,7 +235,9 @@ class Werewolf_Hunter(Player):
 # Needs to be implemented (check previous bibles)
 class Vigilante(Player):
     TEAM = Team.Town
-
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        
     def at_night(self, action ,*args, **kwargs):
         if action == 'investigate':
             self.game.add_action(self, self.investigate, Priority.Investigate, args, kwargs)
@@ -242,7 +260,9 @@ class Chosen_One(Player):
     Immunity to Dark Lord's killing power also means immunity to Head Death Eater attacks IF the Head Death Eater is acting on the orders of the Dark Lord.	Chosen One, Veteran, Dueler, Head Death Eater, Inferius
     """
     TEAM = Team.Town
-    attack_power = 1
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 1
 
     def at_night(self, action ,*args, **kwargs):
         if self.will_suicide:
@@ -272,24 +292,23 @@ class Veteran(Player):
     Chosen One, Veteran, Dueler, Head Death Eater, Inferius
     """
     TEAM = Team.Town
-    attack_power = 2
-    vests = 4
 
-    # Extra local vaciables
     def __init__(self, game: Game, player_id, name=None):
         super().__init__(game, player_id, name)
         self.defended = False
+        self.attack_power = 2
+        self.vests = 4
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'vest':
-            assert vests > 0
-            vests -= 1
             self.game.add_action(self, self.vest, Priority.Immediate, args, kwargs)
             self.game.add_action(self, self.end_vest, Priority.CleanUp, args, kwargs)
         else:
             print('Action', action,'not found for',self.__class__.__name__)
 
     def vest(self) -> None:
+        assert self.vests > 0
+        self.vests -= 1
         defense_power = 2
         roleblock_immunity = True
         control_immunity = True
@@ -355,16 +374,18 @@ class Bodyguard(Player):
     None	2	1 if vested	Bite immune when vested	Does not attack non-killing visitors like the dementor or the Obscurus.	Patronus, Dark Lord, Crusader, Protego Diabolicus
     """
     TEAM = Team.Town
-    attack_power = 2
-    vests = 2
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 2
+        self.vests = 2
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'protect':
             self.game.add_action(self, self.protect, Priority.Investigate, args, kwargs)
             self.game.add_action(self, self.end_protect, Priority.CleanUp, args, kwargs)
         elif action == 'vest': # Additional Action
-            assert vests > 0
-            vests -= 1
+            assert self.vests > 0
+            self.vests -= 1
             self.game.add_action(self, self.vest, Priority.Investigate, args, kwargs) #AMB: vest go on TT 0?
             self.game.add_action(self, self.end_vest, Priority.CleanUp, args, kwargs)
         else:
@@ -388,12 +409,12 @@ class Bodyguard(Player):
             self.submit(f'You Died while defending')
         
     def vest(self) -> None:
-        defense_power = 1
-        bite_immunity = True
+        self.defense_power = 1
+        self.bite_immunity = True
 
     def end_vest(self) -> None:
-        defense_power = 0
-        bite_immunity = False
+        self.defense_power = 0
+        self.bite_immunity = False
 
 class Doctor(Player): # AMB: Does healing get rid of poison or anything else?
     """
@@ -401,6 +422,8 @@ class Doctor(Player): # AMB: Does healing get rid of poison or anything else?
     None	0	0			Phoenix, Animagus, Official, Potion Master, Hex Master
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'heal':
@@ -421,7 +444,9 @@ class Crusader(Player):
     Cannot protect yourself.	None	1	0			Patronus, Dark Lord, Seer, Crusader, Dementor
     """
     TEAM = Team.Town
-    attack_power = 1
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 1
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'protect':
@@ -455,7 +480,9 @@ class Trapper(Player):
     None	2	0		Does not attack non-killing visitors like the dementor or the Obscurus.	Sorcerer, Necromancer, Cursebreaker, Magic Bomber
     """
     TEAM = Team.Town
-    attack_power = 2
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.attack_power = 2
 
     # Extra local vaciables
     def __init__(self, game: Game, player_id, name=None):
@@ -476,8 +503,9 @@ class Trapper(Player):
                 del player.trappers[trapped_player]
             trapped_player = player
             player.trappers[trapped_player] = False
+            self.submit(f'You set a trap at {player.name}')
         else:
-            player.submit(f'You were roleblocked')
+            self.submit(f'You were roleblocked')
    
 class Priest(Player):
     """
@@ -488,7 +516,6 @@ class Priest(Player):
     None	0	0			Time Turner, Professor, poltergeist
     """
     TEAM = Team.Town
-    # Extra local vaciables
     def __init__(self, game: Game, player_id, name=None):
         super().__init__(game, player_id, name)
         self.last_heal = 0
@@ -544,40 +571,37 @@ class Retributionist(Player):
     Bite immune if vested	cannot revive a Polyjuice Potioneer	Sorcerer, Necromancer, Cursebreaker, Magic Bomber
     """
     TEAM = Team.Town
-    # Extra local vaciables
     def __init__(self, game: Game, player_id, name=None):
         super().__init__(game, player_id, name)
         self.can_ressurrect = True
+        self.vests = 3
 
     def at_night(self, action ,*args, **kwargs):
         if action == 'ressurrect':
-            assert self.can_ressurrect and not args[0].alive and args[0].role not in ['']
+            bad_ressurrects = ['Disguiser', 'Priest', 'Necromancer', 'Trapper', 'Bomber']
+            assert self.can_ressurrect and not args[0].alive and args[0].role not in bad_ressurrects and self.game.night >= 3
             self.can_ressurrect = False
             self.game.add_action(self, self.ressurrect, Priority.Ressurrect, args, kwargs)
         elif action == 'vest':
-            assert vests > 0
-            vests -= 1
+            assert self.vests > 0
+            self.vests -= 1
             self.game.add_action(self, self.vest, Priority.Immediate, args, kwargs)
-            self.game.add_action(self, self.end_vest, Priority.CleanUp, args, kwargs) #AMB: not specified
+            self.game.add_action(self, self.end_vest, Priority.CleanUp, args, kwargs) #AMB: TT not specified
         else:
             print('Action', action,'not found for',self.__class__.__name__)
 
-    def investigate(self, player_name: Union[int, str]) -> None:
+    def ressurrect(self, player_name: Union[int, str]) -> None:
         player = self.game.get_player(player_name)
         self.visit(player)
-        if not self.roleblocked:
-            result = INVEST_RESULTS[player.role]
-            self.submit(f'target is one of {result}')
-        else:
-            self.submit(f'You were roleblocked')
+        player.alive = True
     
     def vest(self) -> None:
-        defense_power = 2
-        bite_immunity = True
+        self.defense_power = 2
+        self.bite_immunity = True
     
     def end_vest(self) -> None:
-        defense_power = 0
-        bite_immunity = False
+        self.defense_power = 0
+        self.bite_immunity = False
 
 class Transporter(Player):
     """
@@ -587,19 +611,25 @@ class Transporter(Player):
     If you transport a converting Werewolf, the transport will occur and you will be converted.	Quidditch Captain, Knight Bus Driver, Mirage, Moosehead
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.roleblock_immunity = True
+        self.control_immunity = True
 
     def at_night(self, action ,*args, **kwargs):
-        if action == 'investigate':
-            self.game.add_action(self, self.investigate, Priority.Investigate, args, kwargs)
+        if action == 'swap':
+            self.game.add_action(self, self.swap, Priority.Transport, args, kwargs)
         else:
             print('Action', action,'not found for',self.__class__.__name__)
 
-    def investigate(self, player_name: Union[int, str]) -> None:
+    def swap(self, player_name: Union[int, str], player_name2: Union[int, str]) -> None:
         player = self.game.get_player(player_name)
+        player2 = self.game.get_player(player_name2)
         self.visit(player)
+        self.visit(player2)
         if not self.roleblocked:
-            result = INVEST_RESULTS[player.role]
-            self.submit(f'target is one of {result}')
+            self.game.swaps.append([player.id,player2.id])
+            self.submit(f'You tried to swap {player.name} and {player2.name}')
         else:
             self.submit(f'You were roleblocked')
 
@@ -610,19 +640,27 @@ class Moosehead(Player):
     their chosen action on a random target."	None	0	0	Role-block immune, control immune		Auror, Executioner, Werewolf, Caretaker
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.roleblock_immunity = True
+        self.control_immunity = True
 
     def at_night(self, action ,*args, **kwargs):
-        if action == 'investigate':
-            self.game.add_action(self, self.investigate, Priority.Investigate, args, kwargs)
+        if action == 'disorient':
+            self.game.add_action(self, self.disorient, Priority.Controlling, args, kwargs)
         else:
             print('Action', action,'not found for',self.__class__.__name__)
 
-    def investigate(self, player_name: Union[int, str]) -> None:
+    def disorient(self, player_name: Union[int, str]) -> None:
         player = self.game.get_player(player_name)
         self.visit(player)
         if not self.roleblocked:
-            result = INVEST_RESULTS[player.role]
-            self.submit(f'target is one of {result}')
+            alive_players = [] #maybe should keep track of this
+            for a_player in self.game.players:
+                if self.game.get_player(a_player).alive:
+                    alive_players.append(a_player)
+            player.control_id = np.random.choice(alive_players)
+            self.submit(f'You disoriented {player.name} so that they acted on {self.game.get_player(player.control_id).name}') #AMB: Is the disoriented player informed of the control?
         else:
             self.submit(f'You were roleblocked')
 
@@ -633,8 +671,40 @@ class Escort(Player):
     None	0	0	Role-block immune	Some roles are role-block immune, and others (SK, active Werewolf) will kill or convert you	Sphinx, Veela, Dementor, Grim
     """
     TEAM = Team.Town
+    def __init__(self, game: Game, player_id, name=None):
+        super().__init__(game, player_id, name)
+        self.roleblock_immunity = True
 
     def at_night(self, action ,*args, **kwargs):
+        if action == 'roleblock':
+            self.game.add_action(self, self.roleblock, Priority.RoleBlock, args, kwargs)
+        else:
+            print('Action', action,'not found for',self.__class__.__name__)
+
+    def roleblock(self, player_name: Union[int, str]) -> None:
+        player = self.game.get_player(player_name)
+        self.visit(player)
+        if not self.roleblocked:
+            if player.check_roleblocked():
+                self.submit(f'{player.name} successfully roleblocked')
+            else:
+                self.submit(f'{player.name} roleblock failed')
+            # Unlink player Enforcer links
+            for player2 in player.links.keys():
+                del player.links[player2]
+                if player in player2.links.keys():
+                    del player2.links[player]
+        else:
+            self.submit(f'You were roleblocked')
+
+########################
+#         MAFIA        #
+########################
+
+class Consigliere(Player):
+    TEAM = Team.Mafia
+
+    def at_night(self, action, *args, **kwargs):
         if action == 'investigate':
             self.game.add_action(self, self.investigate, Priority.Investigate, args, kwargs)
         else:
@@ -644,15 +714,10 @@ class Escort(Player):
         player = self.game.get_player(player_name)
         self.visit(player)
         if not self.roleblocked:
-            result = INVEST_RESULTS[player.role]
-            self.submit(f'target is one of {result}')
+            self.submit(f'target\'s role is {player.role}')
         else:
             self.submit(f'You were roleblocked')
 
-########################
-#         MAFIA        #
-########################
-"""
 class Consigliere(Player):
     TEAM = Team.Mafia
 

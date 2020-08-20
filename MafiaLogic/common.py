@@ -28,16 +28,16 @@ INVEST_SETS = frozenset({
 INVEST_RESULTS = {key: value for value in INVEST_SETS for key in value}
 
 
-class Team(Enum):
-    NeutralBenign = 0
-    Town = 1
-    Mafia = 2
-    Coven = 3
-    Pirate = 4
-    NeutralChaos = 5
-    NeutralEvil = 6
-    Werewolves = 7
-    Vampire = 8
+class Team(Enum): # We add 1000 to each of these in order to differentiate between a team and player action argument
+    NeutralBenign = 1000
+    Town = 1001
+    Mafia = 1002
+    Coven = 1003
+    Pirate = 1004
+    NeutralChaos = 1005
+    NeutralEvil = 1006
+    Werewolves = 1007
+    Vampire = 1008
 
 
 class Priority(Enum):
@@ -59,17 +59,14 @@ class Priority(Enum):
     StartDay = 256
     CleanUp = 512
 
-
 class TimeOfDay(Enum):
     Morning = 0
     Nomination = 1
     Trial = 2
     Night = 3
 
-
 def noop(*args, **kwargs):
     return
-
 
 class Game(object, metaclass=abc.ABCMeta):
     def __init__(self):
@@ -81,6 +78,8 @@ class Game(object, metaclass=abc.ABCMeta):
         self.night: int = 0
         self.full_moon: bool = True
         self.time_of_day: TimeOfDay = TimeOfDay.Night
+        # Array of player_id swaps, i.e. [[1,2],[3,4]] are swaps 1<->2 and 3<->4
+        self.swaps: List[List[int]] = []
 
     @abc.abstractmethod
     def start(self):
@@ -99,15 +98,15 @@ class Player(object):
     # attributes that should be modified by the subclass
     TEAM = Team.NeutralBenign
     IS_UNIQUE = False
-    default_defense = defense_power = 0
-    vests = 0
-    attack_power = 0
-    detection_immunity = False
-    bite_immunity = False
-    control_immunity = False
-    roleblock_immunity = False
 
     def __init__(self, game: Game, player_id, name=None):
+        self.defense_power: int = 0
+        self.default_defense: int = self.defense_power
+        self.attack_power: int = 0
+        self.detection_immunity: bool = False
+        self.bite_immunity: bool = False
+        self.control_immunity: bool = False
+        self.roleblock_immunity: bool = False
         self.game: Game = game
         self.role: str = self.__class__.__name__
         self.id: Union[int, str] = player_id
@@ -121,6 +120,9 @@ class Player(object):
         self.bribed: bool = False
         self.infected: bool = False
         self.will_suicide: bool = False
+        self.vests: int = 0
+        # Enforcer links: links[Player] = 3 to start, once reaches 0 the link is broken. 
+        self.links: Dict[Player,int] = {}
         # Dict of Player:active, where active is a bool
         self.trappers = {}
         # Variables which reset every night
@@ -130,6 +132,7 @@ class Player(object):
         self.visited: List[Player] = []
         self.roleblocked: bool = False
         self.controlled: bool = False
+        self.control_id: int = -1
 
         self._queued_action = None
         self._messages = defaultdict(list)
@@ -157,7 +160,7 @@ class Player(object):
     def visit(self, visited_player, hostile=False):
         for trapper, active in visited_player.trappers.items():
             if active:
-                self.roleblocked()
+                self.check_roleblocked()
                 if hostile:
                     trapper.attack(self)
                 else:
@@ -179,9 +182,11 @@ class Player(object):
             self.submit(f'You failed to kill {attacked_player.name}')
         return killed
 
-    def roleblocked(self):
+    def check_roleblocked(self) -> bool:
         if not self.roleblock_immunity:
+            self.submit(f'You have been roleblocked')
             self.roleblocked = True
+        return self.roleblocked
 
     def reset_action(self):
         if self._queued_action:
@@ -194,6 +199,14 @@ class Player(object):
         self.jailed = False
         self.roleblocked = False
         self.controlled = False
+        self.control_id = -1
         self.defense_power = self.default_defense
         for k in self.trappers.keys():
             self.trappers[k] = True
+        for player in self.links.keys():
+            self.links[player] -= 1
+            if self.links[player] == 0:
+                del self.links[player]
+                if self in player.links.keys():
+                    del player.links[self]
+
