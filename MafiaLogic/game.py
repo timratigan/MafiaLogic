@@ -44,6 +44,10 @@ class MafiaGame(Game, ABC):
         while not self._parse(input()):
             pass
 
+    # TODO: Replace with deterministic random based upon past actions
+    def random(self):
+        return np.random.random()
+
     def add_action(self, player: Player, cb, priority: Priority, args=None, kwargs=None) -> None:
         player._queued_action = [player, cb, args, kwargs]
         self._action_queue[priority].append(player._queued_action)
@@ -82,7 +86,7 @@ class MafiaGame(Game, ABC):
                     if not action:
                         continue
                     player, cb, args, kwargs = action
-                    if not player.jailed and player.alive:
+                    if (not player.jailed and player.alive) or priority == Priority.CleanUp:
                         cb(*args, **kwargs)
             for player in self.players:
                 self.get_player(player).reset_action()

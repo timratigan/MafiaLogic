@@ -57,6 +57,7 @@ class Priority(Enum):
     Transform = 10
     Haunt = 11
     StartDay = 256
+    CleanUp = 512
 
 
 class TimeOfDay(Enum):
@@ -98,7 +99,7 @@ class Player(object):
     # attributes that should be modified by the subclass
     TEAM = Team.NeutralBenign
     IS_UNIQUE = False
-    defense_power = 0
+    default_defense = defense_power = 0
     attack_power = 0
     detection_immunity = False
     bite_immunity = False
@@ -112,14 +113,20 @@ class Player(object):
         self.name: Union[int, str] = self.id if name is None else name
         self.alive: bool = True
         self.lover: Union[Player, None] = None
-        # Nightly visits/visited
+        self.doused: bool = False
+        self.hexed: bool = False
+        self.framed: bool = False
+        self.bribed: bool = False
+        self.poisoned: bool = False
+        self.infected: bool = False
+        self.will_suicide: bool = False
+        # Dict of Player:active, where active is a bool
+        self.trappers = {}
+        # Variables which reset every night
+        self.jailed: bool = False
+        self.protectors: List[Player] = []
         self.visits: List[Player] = []
         self.visited: List[Player] = []
-        self.framed: bool = False
-        self.hexed: bool = False
-        self.jailed: bool = False
-        self.infected: bool = False
-        self.doused: bool = False
         self.roleblocked: bool = False
         self.controlled: bool = False
 
@@ -146,12 +153,21 @@ class Player(object):
     def submit(self, message):
         self._messages[self.game.night].append(message)
 
-    def visit(self, visited_player):
+    def visit(self, visited_player, hostile=False):
+        for trapper, active in visited_player.trappers.items():
+            if active:
+                self.roleblocked()
+                if hostile:
+                    trapper.attack(self)
+                else:
+                    trapper.submit(f'A {self.role} visited your trap at {visited_player.name}')
         self.visits.append(visited_player)
         visited_player.visited.append(self)
 
     def attack(self, attacked_player) -> bool:
-        print(self.attack_power,attacked_player.defense_power)
+        self.visit(attacked_player, True)
+        for protector in attacked_player.protectors:
+            protector.protect_from(self)
         killed = self.attack_power > attacked_player.defense_power
         if killed:
             attacked_player.alive = False
@@ -162,12 +178,21 @@ class Player(object):
             self.submit(f'You failed to kill {attacked_player.name}')
         return killed
 
+    def roleblocked(self):
+        if not self.roleblock_immunity:
+            self.roleblocked = True
 
     def reset_action(self):
         if self._queued_action:
             self._queued_action[1] = noop
 
     def reset_status(self):
+        self.protectors = []
         self.visits = []
         self.visited = []
         self.jailed = False
+        self.roleblocked = False
+        self.controlled = False
+        self.defense_power = self.default_defense
+        for k in self.trappers.keys():
+            self.trappers[k] = True
