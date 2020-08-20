@@ -36,11 +36,12 @@ class Team(Enum):
     Pirate = 4
     NeutralChaos = 5
     NeutralEvil = 6
-    Hate = 7
+    Werewolves = 7
     Vampire = 8
 
 
 class Priority(Enum):
+    PrevDay = -1
     Immediate = 0
     Controlling = 1
     Duel = 2
@@ -56,6 +57,7 @@ class Priority(Enum):
     Transform = 10
     Haunt = 11
     StartDay = 256
+    CleanUp = 512
 
 
 class TimeOfDay(Enum):
@@ -77,6 +79,7 @@ class Game(object, metaclass=abc.ABCMeta):
         self.players_by_name: Dict[Union[int, str], Player] = {}
         self.dead_players_by_name: Dict[Union[int, str], Player] = {}
         self.night: int = 0
+        self.full_moon: bool = True
         self.time_of_day: TimeOfDay = TimeOfDay.Night
 
     @abc.abstractmethod
@@ -96,18 +99,36 @@ class Player(object):
     # attributes that should be modified by the subclass
     TEAM = Team.NeutralBenign
     IS_UNIQUE = False
+    default_defense = defense_power = 0
+    attack_power = 0
+    detection_immunity = False
+    bite_immunity = False
+    control_immunity = False
+    roleblock_immunity = False
 
     def __init__(self, game: Game, player_id, name=None):
         self.game: Game = game
         self.role: str = self.__class__.__name__
         self.id: Union[int, str] = player_id
         self.name: Union[int, str] = self.id if name is None else name
+        self.alive: bool = True
         self.lover: Union[Player, None] = None
-        self.framed: bool = False
-        self.hexed: bool = False
-        self.infected: bool = False
         self.doused: bool = False
-        self.defense = 0
+        self.hexed: bool = False
+        self.framed: bool = False
+        self.bribed: bool = False
+        self.poisoned: bool = False
+        self.infected: bool = False
+        self.will_suicide: bool = False
+        # Dict of Player:active, where active is a bool
+        self.trappers = {}
+        # Variables which reset every night
+        self.jailed: bool = False
+        self.protectors: List[Player] = []
+        self.visits: List[Player] = []
+        self.visited: List[Player] = []
+        self.roleblocked: bool = False
+        self.controlled: bool = False
 
         self._queued_action = None
         self._messages = defaultdict(list)
@@ -117,15 +138,61 @@ class Player(object):
 
     def at_night(self, *args, **kwargs) -> None:
         pass
+    
+    def __str__(self):
+        return self.name + '-' + self.role
+
+    def __repr__(self):
+        return self.name + '-' + self.role
 
     @property
     def is_good(self):
-        return self.TEAM in [Team.Town, Team.NeutralBenign, Team.Hate] and \
+        return self.TEAM in [Team.Town, Team.NeutralBenign, Team.Werewolves] and \
                self.role not in ['Anarchist', 'HexMaster', 'Arsonist']
 
     def submit(self, message):
         self._messages[self.game.night].append(message)
 
+    def visit(self, visited_player, hostile=False):
+        for trapper, active in visited_player.trappers.items():
+            if active:
+                self.roleblocked()
+                if hostile:
+                    trapper.attack(self)
+                else:
+                    trapper.submit(f'A {self.role} visited your trap at {visited_player.name}')
+        self.visits.append(visited_player)
+        visited_player.visited.append(self)
+
+    def attack(self, attacked_player) -> bool:
+        self.visit(attacked_player, True)
+        for protector in attacked_player.protectors:
+            protector.protect_from(self)
+        killed = self.attack_power > attacked_player.defense_power
+        if killed:
+            attacked_player.alive = False
+            attacked_player.submit(f'You were killed by the {self.role}')
+            self.submit(f'You killed {attacked_player.name}, the {attacked_player.role}')
+        else:
+            attacked_player.submit(f'You defended yourself from {self.role}')
+            self.submit(f'You failed to kill {attacked_player.name}')
+        return killed
+
+    def roleblocked(self):
+        if not self.roleblock_immunity:
+            self.roleblocked = True
+
     def reset_action(self):
         if self._queued_action:
             self._queued_action[1] = noop
+
+    def reset_status(self):
+        self.protectors = []
+        self.visits = []
+        self.visited = []
+        self.jailed = False
+        self.roleblocked = False
+        self.controlled = False
+        self.defense_power = self.default_defense
+        for k in self.trappers.keys():
+            self.trappers[k] = True

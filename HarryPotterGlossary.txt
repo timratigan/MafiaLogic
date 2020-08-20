@@ -1,0 +1,37 @@
+Investigator -> High Inquistor
+Tracker -> Marauder
+Psychic -> Seer
+Sheriff -> Auror
+Spy -> Animagus
+Jailor -> Chief Warlock of the Wizengamot
+Vigilante -> Chosen One
+Chef -> Herbologist
+Bodyguard -> Patronus
+Doctor -> Phoenix
+Trapper -> Cursebreaker
+Priest -> Professor
+Retributionist -> Sorcerer
+Transporter -> Quidditch Captain
+Escort -> Sphinx
+Godfather -> Dark Lord
+Mafioso -> Head Death Eater
+Ambusher -> Inferius
+Bomber -> Magic Bomber
+Lawyer -> Official
+Poisoner -> Polyjuice Potioneer
+Janitor -> Caretaker
+Hypnotist -> Legilimens
+House Painter -> Knight Bus Driver
+Thug -> Protego Diabolicus
+?? -> Time Turner
+Consort -> Dementor
+Coven Leader -> Curse Master
+Siren -> Veela
+Medusa -> Basilisk
+Survivor -> Centaur
+Pirate -> Dueler
+Jester -> Poltergeist
+Plaguebearer -> Obscurus
+Pestilence -> Fatal Obscurus
+Serial Killer -> Grim
+Arsonist -> Enforcer
